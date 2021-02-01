@@ -27,6 +27,7 @@ import com.google.mediapipe.framework.AndroidPacketCreator;
 import com.google.mediapipe.framework.PacketGetter;
 import com.google.mediapipe.framework.Packet;
 import com.google.mediapipe.glutil.EglManager;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -109,21 +110,16 @@ public class MainActivity extends AppCompatActivity {
         inputSidePackets.put(INPUT_NUM_HANDS_SIDE_PACKET_NAME, packetCreator.createInt32(NUM_HANDS));
         processor.setInputSidePackets(inputSidePackets);
 
-        // To show verbose logging, run:
+//        // To show verbose logging, run:
         // adb shell setprop log.tag.MainActivity VERBOSE
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             processor.addPacketCallback(
                     OUTPUT_LANDMARKS_STREAM_NAME,
                     (packet) -> {
-                        Log.v(TAG, "Received multi-hand landmarks packet.");
                         List<NormalizedLandmarkList> multiHandLandmarks =
                                 PacketGetter.getProtoVector(packet, NormalizedLandmarkList.parser());
-                        Log.v(
-                                TAG,
-                                "[TS:"
-                                        + packet.getTimestamp()
-                                        + "] "
-                                        + getMultiHandLandmarksDebugString(multiHandLandmarks));
+                        Log.i(
+                                TAG, getMultiHandLandmarksDebugString(multiHandLandmarks));
                     });
         }
     }
@@ -237,29 +233,29 @@ public class MainActivity extends AppCompatActivity {
         if (multiHandLandmarks.isEmpty()) {
             return "No hand landmarks";
         }
-        String multiHandLandmarksStr = "Number of hands detected: " + multiHandLandmarks.size() + "\n";
+        String multiHandLandmarksStr = "";
         int handIndex = 0;
         for (NormalizedLandmarkList landmarks : multiHandLandmarks) {
-            multiHandLandmarksStr +=
-                    "\t#Hand landmarks for hand[" + handIndex + "]: " + landmarks.getLandmarkCount() + "\n";
+//            multiHandLandmarksStr +=
+//                    "\t#Hand landmarks for hand[" + handIndex + "]: " + landmarks.getLandmarkCount() + "\n";
             int landmarkIndex = 0;
             for (NormalizedLandmark landmark : landmarks.getLandmarkList()) {
-                multiHandLandmarksStr +=
-                        "\t\tLandmark ["
-                                + landmarkIndex
-                                + "]: ("
-                                + landmark.getX()
-                                + ", "
-                                + landmark.getY()
-                                + ", "
-                                + landmark.getZ()
-                                + ")\n";
+//                if (landmarkIndex == 8) {
+                    multiHandLandmarksStr +=
+                            "\t\tLandmark ["
+                                    + landmarkIndex
+                                    + "]: ("
+                                    + landmark.getX()
+                                    + ", "
+                                    + landmark.getY()
+                                    + ", "
+                                    + landmark.getZ()
+                                    + ")\n";
+//                }
                 ++landmarkIndex;
             }
             ++handIndex;
         }
         return multiHandLandmarksStr;
     }
-
-
 }
